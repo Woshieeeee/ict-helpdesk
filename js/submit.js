@@ -101,6 +101,15 @@ function updateTrackerStatus(status) {
     statusElement.textContent = status;
 }
 
+function hideTicketTracker() {
+    const tracker = document.getElementById("ticketTracker");
+    tracker.classList.remove("show");
+    document.getElementById("trackerTicketNum").textContent = "";
+    document.getElementById("trackerSubject").textContent = "";
+    document.getElementById("trackerStatus").textContent = "";
+    document.getElementById("trackerTime").textContent = "";
+}
+
 function startTrackerPolling(ticketId, ticketNumber) {
     if (trackerPollInterval) {
         clearInterval(trackerPollInterval);
@@ -116,21 +125,26 @@ function startTrackerPolling(ticketId, ticketNumber) {
             let tickets = data.record.tickets || [];
             const ticket = tickets.find(t => t.id === ticketId);
 
-            if (ticket) {
-                updateTrackerStatus(ticket.status);
-                document.getElementById("trackerTime").textContent = 
-                    "Last updated: " + new Date().toLocaleTimeString();
+            if (!ticket) {
+                clearInterval(trackerPollInterval);
+                hideTicketTracker();
+                showPopup("⚠️", "Ticket Removed", "This ticket was deleted or no longer exists.", "warning");
+                return;
+            }
 
-                // Show notification if status changed
-                if (ticket.status !== submissionStatus.status) {
-                    notifyStatusChange(ticket);
-                    submissionStatus.status = ticket.status;
-                }
+            updateTrackerStatus(ticket.status);
+            document.getElementById("trackerTime").textContent = 
+                "Last updated: " + new Date().toLocaleTimeString();
 
-                // Stop polling if resolved or closed
-                if (ticket.status === "Resolved" || ticket.status === "Closed") {
-                    clearInterval(trackerPollInterval);
-                }
+            // Show notification if status changed
+            if (ticket.status !== submissionStatus.status) {
+                notifyStatusChange(ticket);
+                submissionStatus.status = ticket.status;
+            }
+
+            // Stop polling if resolved or closed
+            if (ticket.status === "Resolved" || ticket.status === "Closed") {
+                clearInterval(trackerPollInterval);
             }
         } catch (error) {
             console.error("Error polling for ticket:", error);
