@@ -1,0 +1,165 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* ===== PAGE BACKGROUND ===== */
+body {
+    background: #f4f7fb;
+    color: #111;
+    transition: 0.3s;
+}
+
+/* ===== HEADER ===== */
+header {
+    background: linear-gradient(135deg, #0a66c2, #0047ab);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* ===== CONTAINER ===== */
+.container {
+    width: 90%;
+    max-width: 1000px;
+    margin: auto;
+    padding: 20px 0;
+}
+
+/* ===== CARD DESIGN ===== */
+.card {
+    background: white;
+    padding: 18px;
+    margin: 12px 0;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+/* ===== INPUTS ===== */
+input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    transition: 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: #0a66c2;
+}
+
+/* ===== BUTTONS ===== */
+button {
+    background: #0a66c2;
+    color: white;
+    border: none;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: 0.2s;
+}
+
+button:hover {
+    background: #084a94;
+}
+
+/* ===== STATUS BADGES ===== */
+.status {
+    padding: 4px 10px;
+    border-radius: 20px;
+    color: white;
+    font-size: 12px;
+    display: inline-block;
+}
+
+.pending {
+    background: orange;
+}
+
+.progress,
+.in-progress {
+    background: dodgerblue;
+}
+
+.resolved {
+    background: green;
+}
+
+.closed {
+    background: gray;
+}
+
+/* ===== LINKS ===== */
+a {
+    display: inline-block;
+    margin-top: 10px;
+    color: #0a66c2;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* ===== STATS BOX ===== */
+#stats .card {
+    text-align: center;
+}
+
+/* ===== DARK MODE ===== */
+.dark {
+    background: #121212;
+    color: #ffffff;
+}
+
+.dark header {
+    background: linear-gradient(135deg, #1f1f1f, #333);
+}
+
+.dark .card {
+    background: #1e1e1e;
+    color: white;
+}
+
+.dark input,
+.dark select,
+.dark textarea {
+    background: #2a2a2a;
+    color: white;
+    border: 1px solid #444;
+}
+
+.dark button {
+    background: #333;
+}
+
+.dark button:hover {
+    background: #555;
+}
+
+.dark a {
+    color: #4ea1ff;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+
+    .container {
+        width: 95%;
+    }
+}
