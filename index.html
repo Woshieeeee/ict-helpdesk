@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OfficeStock Pro · Public + Secure Edit</title>
+    <title>OfficeStock Pro · Forgot Password</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -275,6 +275,18 @@
         .modal-card .close-modal:hover {
             color: #0f172a;
         }
+        .modal-card .modal-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .modal-card .modal-title i {
+            color: #2563eb;
+        }
         .modal-card .detail-img {
             width: 100%;
             max-height: 260px;
@@ -378,6 +390,12 @@
             background: #f8fafc;
             width: 100%;
         }
+        .modal-card .form-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 14px;
+        }
 
         /* ----- LOGIN OVERLAY ----- */
         .login-overlay {
@@ -438,10 +456,12 @@
             border-radius: 30px;
             font-size: 0.95rem;
             background: #f8fafc;
+            transition: 0.2s;
         }
         .login-card input:focus {
             outline: none;
             border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
         }
         .login-error {
             background: #fee2e2;
@@ -455,22 +475,35 @@
         .login-error.show {
             display: block;
         }
-        .login-card .role-hint {
-            margin-top: 16px;
-            font-size: 0.8rem;
-            color: #64748b;
-            border-top: 1px solid #e2e8f0;
-            padding-top: 16px;
+        .login-card .login-options {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 8px;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            font-size: 0.85rem;
         }
-        .login-card .role-hint span {
-            background: #f1f5f9;
-            padding: 4px 14px;
-            border-radius: 40px;
+        .login-card .login-options a {
+            color: #2563eb;
+            text-decoration: none;
+            cursor: pointer;
             font-weight: 500;
+        }
+        .login-card .login-options a:hover {
+            text-decoration: underline;
+        }
+        .login-card .forgot-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e2e8f0;
+            display: none;
+        }
+        .login-card .forgot-section.active {
+            display: block;
+        }
+        .login-card .forgot-section .info-text {
+            font-size: 0.85rem;
+            color: #475569;
+            margin-bottom: 12px;
         }
 
         /* ----- SCANNER ----- */
@@ -532,6 +565,10 @@
             .modal-card .detail-row .label {
                 width: 80px;
             }
+            .login-card .login-options {
+                flex-direction: column;
+                gap: 8px;
+            }
         }
     </style>
 </head>
@@ -569,29 +606,39 @@
         <div id="loginOverlay" class="login-overlay">
             <div class="login-card">
                 <div class="logo-icon"><i class="fas fa-cubes"></i></div>
-                <h1>Sign In</h1>
-                <p class="sub">to add, edit or delete items</p>
+                <h1>Welcome Back</h1>
+                <p class="sub">Sign in to manage your inventory</p>
                 <div id="loginError" class="login-error"><i class="fas fa-exclamation-circle"></i> Invalid credentials</div>
                 <form id="loginForm">
                     <div class="form-group">
                         <label><i class="fas fa-user"></i> Username</label>
-                        <input type="text" id="loginUsername" placeholder="staff or admin" value="staff" required>
+                        <input type="text" id="loginUsername" placeholder="Enter username" value="staff" required>
                     </div>
                     <div class="form-group">
                         <label><i class="fas fa-lock"></i> Password</label>
-                        <input type="password" id="loginPassword" placeholder="••••••••" value="password" required>
+                        <input type="password" id="loginPassword" placeholder="Enter password" value="password" required>
                     </div>
                     <button type="submit" class="btn" style="width:100%; justify-content:center;"><i class="fas fa-sign-in-alt"></i> Sign In</button>
                 </form>
-                <div class="role-hint">
-                    <span><i class="fas fa-user"></i> staff / password</span>
-                    <span><i class="fas fa-user-shield"></i> admin / admin123</span>
+                <div class="login-options">
+                    <a id="forgotPasswordLink"><i class="fas fa-key"></i> Forgot Password?</a>
+                    <button class="btn btn-outline btn-sm" id="closeLoginBtn">Cancel</button>
                 </div>
-                <button class="btn btn-outline btn-sm" style="margin-top:12px; width:100%; justify-content:center;" id="closeLoginBtn">Cancel</button>
+                <div id="forgotSection" class="forgot-section">
+                    <p class="info-text"><i class="fas fa-info-circle"></i> Enter your username to reset your password.</p>
+                    <form id="forgotForm">
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i> Username</label>
+                            <input type="text" id="forgotUsername" placeholder="Enter your username" required>
+                        </div>
+                        <button type="submit" class="btn btn-success" style="width:100%; justify-content:center;"><i class="fas fa-paper-plane"></i> Send Reset Link</button>
+                    </form>
+                    <button class="btn btn-outline btn-sm" style="margin-top:10px; width:100%; justify-content:center;" id="backToLoginBtn"><i class="fas fa-arrow-left"></i> Back to Login</button>
+                </div>
             </div>
         </div>
 
-        <!-- ====== DETAIL MODAL ====== -->
+        <!-- ====== DETAIL / EDIT MODAL ====== -->
         <div id="detailModal" class="modal-overlay">
             <div class="modal-card">
                 <button class="close-modal" id="closeModalBtn">&times;</button>
@@ -645,7 +692,7 @@
                                     <input type="text" id="editDetails" placeholder="Serial, specs...">
                                 </div>
                             </div>
-                            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+                            <div class="form-actions">
                                 <button type="submit" class="btn btn-sm btn-success"><i class="fas fa-save"></i> Update</button>
                                 <button type="button" class="btn btn-sm btn-danger" id="editDeleteBtn"><i class="fas fa-trash"></i> Delete</button>
                                 <button type="button" class="btn btn-sm btn-outline" id="editCancelBtn">Cancel</button>
@@ -653,6 +700,57 @@
                         </form>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- ====== ADD ITEM MODAL ====== -->
+        <div id="addItemModal" class="modal-overlay">
+            <div class="modal-card">
+                <button class="close-modal" id="closeAddModalBtn">&times;</button>
+                <div class="modal-title"><i class="fas fa-plus-circle"></i> Add New Item</div>
+                <form id="addItemForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Item Name *</label>
+                            <input type="text" id="addName" placeholder="e.g. Dell XPS 15" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="addCategory">
+                                <option>Laptop</option><option>Monitor</option><option>Keyboard</option>
+                                <option>Mouse</option><option>Dock</option><option>Headset</option><option>Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Purchase Date</label>
+                            <input type="date" id="addPurchase">
+                        </div>
+                        <div class="form-group">
+                            <label>Warranty</label>
+                            <select id="addWarranty">
+                                <option value="0">None</option><option value="6">6 mo</option>
+                                <option value="12" selected>12 mo</option><option value="24">24 mo</option><option value="36">36 mo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Photo (optional)</label>
+                            <input type="file" id="addPhoto" accept="image/*" class="file-upload">
+                        </div>
+                        <div class="form-group">
+                            <label>Details</label>
+                            <input type="text" id="addDetails" placeholder="Serial, specs...">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Add Item</button>
+                        <button type="reset" class="btn btn-outline" id="addResetBtn"><i class="fas fa-undo-alt"></i> Reset</button>
+                        <button type="button" class="btn btn-outline" id="addCancelBtn">Cancel</button>
+                    </div>
+                </form>
             </div>
         </div>
 
@@ -697,6 +795,11 @@
             const loginUsername = document.getElementById('loginUsername');
             const loginPassword = document.getElementById('loginPassword');
             const closeLoginBtn = document.getElementById('closeLoginBtn');
+            const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+            const forgotSection = document.getElementById('forgotSection');
+            const forgotForm = document.getElementById('forgotForm');
+            const forgotUsername = document.getElementById('forgotUsername');
+            const backToLoginBtn = document.getElementById('backToLoginBtn');
             const scanQrBtn = document.getElementById('scanQrBtn');
             const scannerOverlay = document.getElementById('scannerOverlay');
             const closeScannerBtn = document.getElementById('closeScannerBtn');
@@ -711,6 +814,11 @@
             const editDeleteBtn = document.getElementById('editDeleteBtn');
             const editCancelBtn = document.getElementById('editCancelBtn');
             const addItemBtn = document.getElementById('addItemBtn');
+            const addItemModal = document.getElementById('addItemModal');
+            const closeAddModalBtn = document.getElementById('closeAddModalBtn');
+            const addItemForm = document.getElementById('addItemForm');
+            const addResetBtn = document.getElementById('addResetBtn');
+            const addCancelBtn = document.getElementById('addCancelBtn');
             const toast = document.getElementById('toastMessage');
 
             // Detail fields
@@ -727,6 +835,14 @@
             const editWarranty = document.getElementById('editWarranty');
             const editPhoto = document.getElementById('editPhoto');
             const editDetails = document.getElementById('editDetails');
+
+            // Add fields
+            const addName = document.getElementById('addName');
+            const addCategory = document.getElementById('addCategory');
+            const addPurchase = document.getElementById('addPurchase');
+            const addWarranty = document.getElementById('addWarranty');
+            const addPhoto = document.getElementById('addPhoto');
+            const addDetails = document.getElementById('addDetails');
 
             // ====== TOAST ======
             function showToast(msg) {
@@ -791,7 +907,7 @@
                                     <button class="download-qr-btn" data-id="${item.id}" title="Download QR"><i class="fas fa-download"></i></button>
                                     ${isAdmin ? `<button class="edit-btn" data-id="${item.id}" title="Edit"><i class="fas fa-pen"></i></button>` : ''}
                                     ${isAdmin ? `<button class="delete-btn" data-id="${item.id}" title="Delete"><i class="fas fa-trash"></i></button>` : ''}
-                                    ${isStaff && !isAdmin ? `<button class="edit-btn" data-id="${item.id}" title="Edit (Staff)"><i class="fas fa-eye"></i></button>` : ''}
+                                    ${isStaff && !isAdmin ? `<button class="edit-btn" data-id="${item.id}" title="View"><i class="fas fa-eye"></i></button>` : ''}
                                 </div>
                             </div>
                         </div>
@@ -847,7 +963,6 @@
                             return;
                         }
                         openDetail(id);
-                        // If admin, show edit section
                         if (isAdmin) {
                             showEditSection(id);
                         } else {
@@ -956,18 +1071,35 @@
                 editSection.style.display = 'none';
             }
 
+            // ====== ADD ITEM MODAL ======
+            function openAddItemModal() {
+                if (!isLoggedIn) {
+                    showToast('🔒 Please login first');
+                    loginOverlay.classList.add('active');
+                    return;
+                }
+                addItemModal.classList.add('active');
+                addItemForm.reset();
+                addName.focus();
+            }
+
+            function closeAddItemModal() {
+                addItemModal.classList.remove('active');
+                addItemForm.reset();
+            }
+
             // ====== CRUD ======
             function addItem(item) {
                 items.push(item);
                 saveItems();
                 renderGrid();
                 showToast(`✅ "${item.name}" added.`);
+                closeAddItemModal();
             }
 
             function updateItem(id, updated) {
                 const idx = items.findIndex(it => it.id === id);
                 if (idx !== -1) {
-                    // Preserve photo if not updated
                     if (!updated.photoData && items[idx].photoData) {
                         updated.photoData = items[idx].photoData;
                     }
@@ -1027,6 +1159,8 @@
                 isLoggedIn = true;
                 currentRole = user.role;
                 loginOverlay.classList.remove('active');
+                // Reset forgot section
+                forgotSection.classList.remove('active');
                 updateLoginState();
                 showToast(`✅ Logged in as ${username} (${currentRole})`);
                 renderGrid();
@@ -1039,6 +1173,7 @@
                 updateLoginState();
                 showToast('🔓 Logged out');
                 closeDetail();
+                closeAddItemModal();
                 if (html5QrCode) { html5QrCode.stop().then(() => {}); html5QrCode = null; }
                 scannerOverlay.classList.remove('active');
                 document.getElementById('qr-reader').innerHTML = '';
@@ -1061,10 +1196,59 @@
                     badge.style.background = '#eef2ff';
                     badge.style.color = '#1e293b';
                     btn.innerHTML = '<i class="fas fa-lock"></i> Login to Edit';
-                    btn.onclick = () => loginOverlay.classList.add('active');
+                    btn.onclick = () => {
+                        loginOverlay.classList.add('active');
+                        forgotSection.classList.remove('active');
+                    };
                     addItemBtn.style.display = 'none';
                 }
             }
+
+            // ====== FORGOT PASSWORD ======
+            function showForgotPassword() {
+                forgotSection.classList.add('active');
+                forgotUsername.value = '';
+                loginForm.style.display = 'none';
+                document.querySelector('.login-options').style.display = 'none';
+                document.querySelector('.sub').textContent = 'Reset your password';
+            }
+
+            function hideForgotPassword() {
+                forgotSection.classList.remove('active');
+                loginForm.style.display = 'block';
+                document.querySelector('.login-options').style.display = 'flex';
+                document.querySelector('.sub').textContent = 'Sign in to manage your inventory';
+                loginError.classList.remove('show');
+            }
+
+            forgotPasswordLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                showForgotPassword();
+            });
+
+            backToLoginBtn.addEventListener('click', function() {
+                hideForgotPassword();
+            });
+
+            forgotForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const username = forgotUsername.value.trim().toLowerCase();
+                if (!username) {
+                    showToast('⚠️ Please enter a username');
+                    return;
+                }
+                if (USERS[username]) {
+                    showToast(`📧 Password reset link sent to ${username}@example.com`);
+                    // Simulate sending email
+                    setTimeout(() => {
+                        hideForgotPassword();
+                        showToast(`💡 Hint: Your password is "${USERS[username].password}"`);
+                    }, 1500);
+                } else {
+                    showToast('⚠️ Username not found');
+                }
+                forgotUsername.value = '';
+            });
 
             // ====== QR SCANNER ======
             function startScanner() {
@@ -1130,9 +1314,61 @@
                 login(uname, pwd);
             });
 
-            closeLoginBtn.addEventListener('click', () => loginOverlay.classList.remove('active'));
+            closeLoginBtn.addEventListener('click', function() {
+                loginOverlay.classList.remove('active');
+                hideForgotPassword();
+            });
             loginOverlay.addEventListener('click', function(e) {
-                if (e.target === this) loginOverlay.classList.remove('active');
+                if (e.target === this) {
+                    loginOverlay.classList.remove('active');
+                    hideForgotPassword();
+                }
+            });
+
+            // Add Item Modal
+            addItemBtn.addEventListener('click', openAddItemModal);
+            closeAddModalBtn.addEventListener('click', closeAddItemModal);
+            addCancelBtn.addEventListener('click', closeAddItemModal);
+            addItemModal.addEventListener('click', function(e) {
+                if (e.target === this) closeAddItemModal();
+            });
+
+            addResetBtn.addEventListener('click', function() {
+                addItemForm.reset();
+                addName.focus();
+            });
+
+            addItemForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const name = addName.value.trim();
+                if (!name) { showToast('⚠️ Please enter item name.'); return; }
+
+                const file = addPhoto.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(ev) {
+                        addItem({
+                            id: generateId(),
+                            name: name,
+                            category: addCategory.value,
+                            purchaseDate: addPurchase.value,
+                            warranty: parseInt(addWarranty.value) || 0,
+                            details: addDetails.value.trim(),
+                            photoData: ev.target.result
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    addItem({
+                        id: generateId(),
+                        name: name,
+                        category: addCategory.value,
+                        purchaseDate: addPurchase.value,
+                        warranty: parseInt(addWarranty.value) || 0,
+                        details: addDetails.value.trim(),
+                        photoData: null
+                    });
+                }
             });
 
             // Scanner
@@ -1155,30 +1391,7 @@
                 }
             });
 
-            // Add item
-            addItemBtn.addEventListener('click', function() {
-                if (!isLoggedIn) {
-                    showToast('🔒 Please login first');
-                    loginOverlay.classList.add('active');
-                    return;
-                }
-                // Open a simple prompt for quick add, or we can open a modal
-                const name = prompt('Enter item name:');
-                if (!name) return;
-                const category = prompt('Category (Laptop/Monitor/Keyboard/Mouse/Dock/Headset/Other):') || 'Other';
-                const newItem = {
-                    id: generateId(),
-                    name: name.trim(),
-                    category: category,
-                    purchaseDate: '',
-                    warranty: 0,
-                    details: '',
-                    photoData: null
-                };
-                addItem(newItem);
-            });
-
-            // Edit form submit
+            // Edit form
             editForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 if (!editingId || !isLoggedIn || currentRole !== 'admin') {
@@ -1230,12 +1443,27 @@
             loadItems();
             loginOverlay.classList.remove('active');
             detailModal.classList.remove('active');
+            addItemModal.classList.remove('active');
             scannerOverlay.classList.remove('active');
             updateLoginState();
 
-            // If user navigates away, close modals
+            // Close modals on escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeDetail();
+                    closeAddItemModal();
+                    stopScanner();
+                    if (loginOverlay.classList.contains('active')) {
+                        loginOverlay.classList.remove('active');
+                        hideForgotPassword();
+                    }
+                }
+            });
+
+            // If user navigates away
             window.addEventListener('popstate', function() {
                 closeDetail();
+                closeAddItemModal();
                 stopScanner();
             });
 
