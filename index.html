@@ -1,228 +1,1245 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>ICT Help Desk</title>
-<link rel="stylesheet" href="css/style.css">
-<style>
-    .success-message {
-        display: none;
-        background: #4CAF50;
-        color: white;
-        padding: 15px;
-        margin-bottom: 20px;
-        border-radius: 5px;
-        text-align: center;
-    }
-
-    .success-message.show {
-        display: block;
-        animation: slideDown 0.3s ease-in;
-    }
-
-    @keyframes slideDown {
-        from { transform: translateY(-20px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-    }
-
-    .ticket-tracker {
-        display: none;
-        background: #f5f5f5;
-        border-left: 4px solid #2196F3;
-        padding: 15px;
-        margin-top: 20px;
-        border-radius: 5px;
-    }
-
-    .ticket-tracker.show {
-        display: block;
-    }
-
-    .tracker-status {
-        font-size: 12px;
-        color: #666;
-        margin-top: 10px;
-    }
-
-    .status-badge {
-        display: inline-block;
-        padding: 5px 10px;
-        border-radius: 3px;
-        font-weight: bold;
-        margin-top: 10px;
-    }
-
-    .status-pending { background: #ff9800; color: white; }
-    .status-in-progress { background: #2196F3; color: white; }
-    .status-resolved { background: #4CAF50; color: white; }
-    .status-closed { background: #999; color: white; }
-
-    /* Popup Notification Styles */
-    .popup-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 2000;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .popup-overlay.show {
-        display: flex;
-    }
-
-    .popup-content {
-        background: white;
-        border-radius: 10px;
-        padding: 30px;
-        text-align: center;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        animation: popupSlideIn 0.3s ease-out;
-        max-width: 400px;
-    }
-
-    @keyframes popupSlideIn {
-        from {
-            transform: scale(0.8);
-            opacity: 0;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OfficeStock Pro · Public + Secure Edit</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
         }
-        to {
-            transform: scale(1);
+        body {
+            background: #f1f5f9;
+            min-height: 100vh;
+            padding: 16px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ----- HEADER ----- */
+        .public-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 12px 24px;
+            border-radius: 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            margin-bottom: 28px;
+            border: 1px solid #e2e8f0;
+        }
+        .public-header .logo h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .public-header .logo i {
+            color: #2563eb;
+            margin-right: 8px;
+        }
+        .public-header .actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            background: #0f172a;
+            border: none;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            background: #1e293b;
+            transform: scale(0.97);
+        }
+        .btn-outline {
+            background: transparent;
+            color: #1e293b;
+            border: 1.5px solid #cbd5e1;
+        }
+        .btn-outline:hover {
+            background: #f1f5f9;
+        }
+        .btn-sm {
+            padding: 6px 16px;
+            font-size: 0.8rem;
+        }
+        .btn-success {
+            background: #16a34a;
+        }
+        .btn-success:hover {
+            background: #15803d;
+        }
+        .btn-danger {
+            background: #dc2626;
+        }
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+        .badge {
+            background: #eef2ff;
+            padding: 4px 14px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        /* ----- TOOLBAR ----- */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            gap: 12px;
+        }
+        .toolbar h3 {
+            color: #0f172a;
+            font-weight: 600;
+        }
+        .toolbar .left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .toolbar .right {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* ----- ITEM GRID ----- */
+        .item-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 24px;
+            margin-top: 4px;
+        }
+        .item-card {
+            background: white;
+            border-radius: 28px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            transition: 0.2s;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            position: relative;
+        }
+        .item-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+            border-color: #b9c7e0;
+        }
+        .item-card .card-img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 16px;
+            background: #eef2f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 2.8rem;
+        }
+        .item-card .card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 16px;
+        }
+        .item-card h3 {
+            margin-top: 12px;
+            font-size: 1.1rem;
+            color: #0f172a;
+            font-weight: 600;
+        }
+        .item-card .meta {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 6px 0;
+            color: #475569;
+            font-size: 0.85rem;
+        }
+        .item-card .meta i {
+            margin-right: 4px;
+            color: #64748b;
+        }
+        .item-card .qr-section {
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-top: 12px;
+            border-top: 1px solid #f1f5f9;
+        }
+        .item-card .qr-section canvas {
+            border-radius: 8px;
+        }
+        .item-card .qr-section .qr-actions {
+            display: flex;
+            gap: 6px;
+        }
+        .item-card .qr-section button {
+            background: none;
+            border: none;
+            color: #2563eb;
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 20px;
+            transition: 0.1s;
+        }
+        .item-card .qr-section button:hover {
+            background: #eef2ff;
+        }
+        .item-card .qr-section .delete-btn {
+            color: #dc2626;
+        }
+        .item-card .qr-section .delete-btn:hover {
+            background: #fee2e2;
+        }
+        .item-card .admin-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #dcfce7;
+            color: #166534;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            font-weight: 600;
+        }
+
+        /* ----- MODAL (detail) ----- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(6px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-card {
+            background: white;
+            border-radius: 40px;
+            max-width: 560px;
+            width: 100%;
+            padding: 32px;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.25);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-card .close-modal {
+            position: sticky;
+            top: 0;
+            float: right;
+            font-size: 1.8rem;
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            padding: 0 8px;
+            z-index: 10;
+        }
+        .modal-card .close-modal:hover {
+            color: #0f172a;
+        }
+        .modal-card .detail-img {
+            width: 100%;
+            max-height: 260px;
+            object-fit: cover;
+            border-radius: 20px;
+            background: #eef2f7;
+            margin-bottom: 16px;
+        }
+        .modal-card .detail-img-placeholder {
+            width: 100%;
+            height: 200px;
+            background: #eef2f7;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+        .modal-card h2 {
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+        .modal-card .detail-row {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .modal-card .detail-row .label {
+            font-weight: 600;
+            width: 120px;
+            color: #475569;
+            flex-shrink: 0;
+        }
+        .modal-card .detail-row .value {
+            color: #0f172a;
+            word-break: break-word;
+        }
+        .modal-card .qr-big {
+            margin: 16px 0;
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .modal-card .qr-big button {
+            background: none;
+            border: 1px solid #e2e8f0;
+            padding: 8px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            color: #2563eb;
+            font-weight: 500;
+            transition: 0.1s;
+        }
+        .modal-card .qr-big button:hover {
+            background: #eef2ff;
+        }
+        .modal-card .edit-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 2px solid #f1f5f9;
+        }
+        .modal-card .edit-section .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .modal-card .edit-section .form-group {
+            flex: 1 0 160px;
+        }
+        .modal-card .edit-section label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #475569;
+            display: block;
+            margin-bottom: 2px;
+        }
+        .modal-card .edit-section input,
+        .modal-card .edit-section select,
+        .modal-card .edit-section textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            background: #fafcff;
+        }
+        .modal-card .edit-section input:focus,
+        .modal-card .edit-section select:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+        .modal-card .edit-section .file-upload {
+            border: 1.5px dashed #cbd5e1;
+            border-radius: 16px;
+            padding: 6px 12px;
+            background: #f8fafc;
+            width: 100%;
+        }
+
+        /* ----- LOGIN OVERLAY ----- */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1500;
+            padding: 20px;
+        }
+        .login-overlay.active {
+            display: flex;
+        }
+        .login-card {
+            background: white;
+            border-radius: 48px;
+            max-width: 420px;
+            width: 100%;
+            padding: 40px 32px;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        .login-card .logo-icon {
+            font-size: 2.8rem;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+        .login-card h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .login-card .sub {
+            color: #475569;
+            margin-bottom: 24px;
+        }
+        .login-card .form-group {
+            text-align: left;
+            margin-bottom: 16px;
+        }
+        .login-card label {
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #1e293b;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .login-card input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            background: #f8fafc;
+        }
+        .login-card input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+        .login-error {
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 8px 14px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            display: none;
+            margin-bottom: 16px;
+        }
+        .login-error.show {
+            display: block;
+        }
+        .login-card .role-hint {
+            margin-top: 16px;
+            font-size: 0.8rem;
+            color: #64748b;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+        .login-card .role-hint span {
+            background: #f1f5f9;
+            padding: 4px 14px;
+            border-radius: 40px;
+            font-weight: 500;
+        }
+
+        /* ----- SCANNER ----- */
+        #qr-reader {
+            width: 100%;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        #qr-reader video {
+            border-radius: 20px;
+        }
+        .scanner-status {
+            margin-top: 12px;
+            text-align: center;
+            color: #475569;
+            font-weight: 500;
+        }
+
+        /* ----- TOAST ----- */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0f172a;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 60px;
+            font-weight: 500;
+            opacity: 0;
+            transition: 0.3s;
+            pointer-events: none;
+            z-index: 3000;
+            font-size: 0.95rem;
+            max-width: 90%;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+        }
+        .toast.show {
             opacity: 1;
         }
-    }
 
-    .popup-icon {
-        font-size: 48px;
-        margin-bottom: 15px;
-    }
-
-    .popup-title {
-        font-size: 22px;
-        font-weight: bold;
-        margin-bottom: 10px;
-        color: #333;
-    }
-
-    .popup-message {
-        font-size: 16px;
-        color: #666;
-        margin-bottom: 20px;
-        line-height: 1.5;
-    }
-
-    .popup-button {
-        background: #4CAF50;
-        color: white;
-        border: none;
-        padding: 12px 30px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-        font-weight: bold;
-        transition: background 0.3s;
-    }
-
-    .popup-button:hover {
-        background: #45a049;
-    }
-
-    .popup-button.error {
-        background: #f44336;
-    }
-
-    .popup-button.error:hover {
-        background: #da190b;
-    }
-
-    .popup-button.warning {
-        background: #ff9800;
-    }
-
-    .popup-button.warning:hover {
-        background: #e68900;
-    }
-</style>
+        /* responsive */
+        @media (max-width: 600px) {
+            .public-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+            .public-header .actions {
+                justify-content: space-between;
+            }
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .modal-card {
+                padding: 20px;
+            }
+            .modal-card .detail-row .label {
+                width: 80px;
+            }
+        }
+    </style>
 </head>
-
 <body>
 
-<header>
-    <h1>ICT Help Desk</h1>
-    <button onclick="toggleDarkMode()">🌙</button>
-</header>
+    <div class="container">
 
-<div class="container">
+        <!-- ====== HEADER ====== -->
+        <header class="public-header">
+            <div class="logo">
+                <h2><i class="fas fa-server"></i> OfficeStock</h2>
+            </div>
+            <div class="actions">
+                <span class="badge" id="viewModeBadge"><i class="fas fa-eye"></i> Public View</span>
+                <button class="btn btn-outline btn-sm" id="scanQrBtn"><i class="fas fa-qrcode"></i> Scan QR</button>
+                <button class="btn btn-sm" id="loginToggleBtn"><i class="fas fa-lock"></i> Login to Edit</button>
+            </div>
+        </header>
 
-<div id="popupOverlay" class="popup-overlay">
-    <div class="popup-content">
-        <div class="popup-icon" id="popupIcon"></div>
-        <div class="popup-title" id="popupTitle"></div>
-        <div class="popup-message" id="popupMessage"></div>
-        <button class="popup-button" id="popupButton" onclick="closePopup()">OK</button>
+        <!-- ====== TOOLBAR ====== -->
+        <div class="toolbar">
+            <div class="left">
+                <h3><i class="fas fa-boxes"></i> Inventory</h3>
+                <span id="itemCountPublic" style="color:#475569; font-size:0.9rem;">0 items</span>
+            </div>
+            <div class="right">
+                <button class="btn btn-sm btn-success" id="addItemBtn"><i class="fas fa-plus"></i> Add Item</button>
+            </div>
+        </div>
+
+        <!-- ====== ITEM GRID ====== -->
+        <div id="itemGrid" class="item-grid"></div>
+
+        <!-- ====== LOGIN OVERLAY ====== -->
+        <div id="loginOverlay" class="login-overlay">
+            <div class="login-card">
+                <div class="logo-icon"><i class="fas fa-cubes"></i></div>
+                <h1>Sign In</h1>
+                <p class="sub">to add, edit or delete items</p>
+                <div id="loginError" class="login-error"><i class="fas fa-exclamation-circle"></i> Invalid credentials</div>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> Username</label>
+                        <input type="text" id="loginUsername" placeholder="staff or admin" value="staff" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-lock"></i> Password</label>
+                        <input type="password" id="loginPassword" placeholder="••••••••" value="password" required>
+                    </div>
+                    <button type="submit" class="btn" style="width:100%; justify-content:center;"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+                </form>
+                <div class="role-hint">
+                    <span><i class="fas fa-user"></i> staff / password</span>
+                    <span><i class="fas fa-user-shield"></i> admin / admin123</span>
+                </div>
+                <button class="btn btn-outline btn-sm" style="margin-top:12px; width:100%; justify-content:center;" id="closeLoginBtn">Cancel</button>
+            </div>
+        </div>
+
+        <!-- ====== DETAIL MODAL ====== -->
+        <div id="detailModal" class="modal-overlay">
+            <div class="modal-card">
+                <button class="close-modal" id="closeModalBtn">&times;</button>
+                <div id="detailContent">
+                    <div class="detail-img-placeholder"><i class="fas fa-camera"></i></div>
+                    <h2 id="detailName">Item Name</h2>
+                    <div class="detail-row"><span class="label">Category</span><span class="value" id="detailCategory">—</span></div>
+                    <div class="detail-row"><span class="label">Purchase Date</span><span class="value" id="detailPurchase">—</span></div>
+                    <div class="detail-row"><span class="label">Warranty</span><span class="value" id="detailWarranty">—</span></div>
+                    <div class="detail-row"><span class="label">Details</span><span class="value" id="detailDetails">—</span></div>
+                    <div class="qr-big">
+                        <div id="detailQrContainer"></div>
+                        <button id="detailDownloadQr"><i class="fas fa-download"></i> Download QR</button>
+                    </div>
+                    <div class="edit-section" id="editSection" style="display:none;">
+                        <h4 style="margin-bottom:10px; color:#0f172a;"><i class="fas fa-pen"></i> Edit Item</h4>
+                        <form id="editForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Item Name *</label>
+                                    <input type="text" id="editName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Category</label>
+                                    <select id="editCategory">
+                                        <option>Laptop</option><option>Monitor</option><option>Keyboard</option>
+                                        <option>Mouse</option><option>Dock</option><option>Headset</option><option>Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Purchase Date</label>
+                                    <input type="date" id="editPurchase">
+                                </div>
+                                <div class="form-group">
+                                    <label>Warranty</label>
+                                    <select id="editWarranty">
+                                        <option value="0">None</option><option value="6">6 mo</option>
+                                        <option value="12" selected>12 mo</option><option value="24">24 mo</option><option value="36">36 mo</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Photo</label>
+                                    <input type="file" id="editPhoto" accept="image/*" class="file-upload">
+                                </div>
+                                <div class="form-group">
+                                    <label>Details</label>
+                                    <input type="text" id="editDetails" placeholder="Serial, specs...">
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+                                <button type="submit" class="btn btn-sm btn-success"><i class="fas fa-save"></i> Update</button>
+                                <button type="button" class="btn btn-sm btn-danger" id="editDeleteBtn"><i class="fas fa-trash"></i> Delete</button>
+                                <button type="button" class="btn btn-sm btn-outline" id="editCancelBtn">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== SCANNER OVERLAY ====== -->
+        <div id="scannerOverlay" class="modal-overlay">
+            <div class="modal-card" style="max-width:500px;">
+                <button class="close-modal" id="closeScannerBtn">&times;</button>
+                <h3 style="margin-bottom:12px;"><i class="fas fa-qrcode" style="color:#2563eb;"></i> Scan QR Code</h3>
+                <div id="qr-reader"></div>
+                <div id="scannerStatus" class="scanner-status">Position a QR code in the frame</div>
+            </div>
+        </div>
+
     </div>
-</div>
 
-<div class="card">
+    <!-- Toast -->
+    <div id="toastMessage" class="toast"></div>
 
-<div class="success-message" id="successMsg"></div>
+    <script>
+        (function() {
+            // ====== CREDENTIALS ======
+            const USERS = {
+                staff: { password: 'password', role: 'staff' },
+                admin: { password: 'admin123', role: 'admin' }
+            };
 
-<form id="ticketForm">
+            // ====== STATE ======
+            let items = [];
+            let currentRole = 'staff';
+            let isLoggedIn = false;
+            let editingId = null;
+            let html5QrCode = null;
 
-<input id="fullname" placeholder="Full Name" required>
-<input id="email" placeholder="Email" required>
+            // ====== DOM REFS ======
+            const itemGrid = document.getElementById('itemGrid');
+            const itemCountPublic = document.getElementById('itemCountPublic');
+            const viewModeBadge = document.getElementById('viewModeBadge');
+            const loginToggleBtn = document.getElementById('loginToggleBtn');
+            const loginOverlay = document.getElementById('loginOverlay');
+            const loginForm = document.getElementById('loginForm');
+            const loginError = document.getElementById('loginError');
+            const loginUsername = document.getElementById('loginUsername');
+            const loginPassword = document.getElementById('loginPassword');
+            const closeLoginBtn = document.getElementById('closeLoginBtn');
+            const scanQrBtn = document.getElementById('scanQrBtn');
+            const scannerOverlay = document.getElementById('scannerOverlay');
+            const closeScannerBtn = document.getElementById('closeScannerBtn');
+            const scannerStatus = document.getElementById('scannerStatus');
+            const detailModal = document.getElementById('detailModal');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const detailDownloadQr = document.getElementById('detailDownloadQr');
+            const detailQrContainer = document.getElementById('detailQrContainer');
+            const detailContent = document.getElementById('detailContent');
+            const editSection = document.getElementById('editSection');
+            const editForm = document.getElementById('editForm');
+            const editDeleteBtn = document.getElementById('editDeleteBtn');
+            const editCancelBtn = document.getElementById('editCancelBtn');
+            const addItemBtn = document.getElementById('addItemBtn');
+            const toast = document.getElementById('toastMessage');
 
-<select id="department">
-<option>ICT</option>
-<option>Finance</option>
-<option>HR</option>
-<option>Operations</option>
-</select>
+            // Detail fields
+            const detailName = document.getElementById('detailName');
+            const detailCategory = document.getElementById('detailCategory');
+            const detailPurchase = document.getElementById('detailPurchase');
+            const detailWarranty = document.getElementById('detailWarranty');
+            const detailDetails = document.getElementById('detailDetails');
 
-<input id="subject" placeholder="Subject" required>
+            // Edit fields
+            const editName = document.getElementById('editName');
+            const editCategory = document.getElementById('editCategory');
+            const editPurchase = document.getElementById('editPurchase');
+            const editWarranty = document.getElementById('editWarranty');
+            const editPhoto = document.getElementById('editPhoto');
+            const editDetails = document.getElementById('editDetails');
 
-<select id="category">
-<option>Hardware</option>
-<option>Software</option>
-<option>Network</option>
-<option>Printer</option>
-</select>
+            // ====== TOAST ======
+            function showToast(msg) {
+                toast.textContent = msg;
+                toast.classList.add('show');
+                clearTimeout(toast._timer);
+                toast._timer = setTimeout(() => toast.classList.remove('show'), 3000);
+            }
 
-<select id="priority">
-<option>Low</option>
-<option>Medium</option>
-<option>High</option>
-</select>
+            // ====== HELPERS ======
+            function generateId() { return Date.now() + '-' + Math.random().toString(36).substr(2, 6); }
 
-<textarea id="description" placeholder="Issue" required></textarea>
+            function formatDate(dateStr) {
+                if (!dateStr) return '—';
+                const d = new Date(dateStr + 'T00:00:00');
+                return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+            }
 
-<button type="submit">Submit Ticket</button>
+            function warrantyLabel(months) {
+                if (!months || months == 0) return 'None';
+                if (months == 6) return '6 mo';
+                if (months == 12) return '1 yr';
+                if (months == 24) return '2 yr';
+                if (months == 36) return '3 yr';
+                return months + ' mo';
+            }
 
-</form>
+            // ====== RENDER GRID ======
+            function renderGrid() {
+                const isAdmin = isLoggedIn && currentRole === 'admin';
+                const isStaff = isLoggedIn && currentRole === 'staff';
 
-<div class="ticket-tracker" id="ticketTracker">
-    <h3>📍 Your Ticket Status</h3>
-    <p><b>Ticket #:</b> <span id="trackerTicketNum"></span></p>
-    <p><b>Subject:</b> <span id="trackerSubject"></span></p>
-    <div class="status-badge" id="trackerStatus"></div>
-    <div class="tracker-status" id="trackerTime"></div>
-</div>
+                if (items.length === 0) {
+                    itemGrid.innerHTML =
+                        `<div style="grid-column:1/-1; text-align:center; padding:60px 0; color:#94a3b8;">
+                            <i class="fas fa-box-open" style="font-size:2.5rem; display:block; margin-bottom:12px;"></i>
+                            No items yet. ${isLoggedIn ? 'Click "Add Item" to get started!' : 'Login to add items.'}
+                        </div>`;
+                    itemCountPublic.textContent = '0 items';
+                    return;
+                }
 
-</div>
+                let html = '';
+                items.forEach(item => {
+                    const imgHtml = item.photoData ?
+                        `<img src="${item.photoData}" alt="photo">` :
+                        `<i class="fas fa-camera"></i>`;
 
-<a href="admin.html">Admin Dashboard</a>
+                    const adminBadge = isAdmin ? `<span class="admin-badge">Admin</span>` : '';
 
-</div>
+                    html += `
+                        <div class="item-card" data-id="${item.id}">
+                            ${adminBadge}
+                            <div class="card-img">${imgHtml}</div>
+                            <h3>${item.name}</h3>
+                            <div class="meta"><span class="badge">${item.category}</span></div>
+                            <div class="meta"><i class="fas fa-calendar-alt"></i> ${formatDate(item.purchaseDate)}</div>
+                            <div class="meta"><i class="fas fa-shield-alt"></i> ${warrantyLabel(item.warranty)}</div>
+                            <div class="qr-section">
+                                <div id="grid-qr-${item.id}" style="width:48px; height:48px;"></div>
+                                <div class="qr-actions">
+                                    <button class="download-qr-btn" data-id="${item.id}" title="Download QR"><i class="fas fa-download"></i></button>
+                                    ${isAdmin ? `<button class="edit-btn" data-id="${item.id}" title="Edit"><i class="fas fa-pen"></i></button>` : ''}
+                                    ${isAdmin ? `<button class="delete-btn" data-id="${item.id}" title="Delete"><i class="fas fa-trash"></i></button>` : ''}
+                                    ${isStaff && !isAdmin ? `<button class="edit-btn" data-id="${item.id}" title="Edit (Staff)"><i class="fas fa-eye"></i></button>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
 
-<audio id="notifySound" src="assets/notification.mp3"></audio>
+                itemGrid.innerHTML = html;
+                itemCountPublic.textContent = items.length + ' items';
 
-<script src="js/config.js"></script>
-<script src="js/submit.js"></script>
-<script src="js/theme.js"></script>
+                // Generate QR codes
+                items.forEach(item => {
+                    const container = document.getElementById('grid-qr-' + item.id);
+                    if (container) {
+                        container.innerHTML = '';
+                        new QRCode(container, {
+                            text: `item:${item.id}`,
+                            width: 44,
+                            height: 44,
+                            colorDark: "#0f172a",
+                            colorLight: "#ffffff",
+                            correctLevel: QRCode.CorrectLevel.H
+                        });
+                    }
+                });
 
+                // Card click -> open detail
+                document.querySelectorAll('.item-card').forEach(card => {
+                    card.addEventListener('click', function(e) {
+                        if (e.target.closest('button')) return;
+                        const id = this.dataset.id;
+                        openDetail(id);
+                    });
+                });
+
+                // Download QR
+                document.querySelectorAll('.download-qr-btn').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const id = this.dataset.id;
+                        const item = items.find(it => it.id === id);
+                        if (item) downloadQrCode(id, item.name);
+                    });
+                });
+
+                // Edit button
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const id = this.dataset.id;
+                        if (!isLoggedIn) {
+                            showToast('🔒 Please login first');
+                            loginOverlay.classList.add('active');
+                            return;
+                        }
+                        openDetail(id);
+                        // If admin, show edit section
+                        if (isAdmin) {
+                            showEditSection(id);
+                        } else {
+                            showToast('👀 View only mode');
+                        }
+                    });
+                });
+
+                // Delete button (admin only)
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        if (!isLoggedIn || currentRole !== 'admin') {
+                            showToast('⛔ Admin only');
+                            return;
+                        }
+                        const id = this.dataset.id;
+                        if (confirm('Delete this item?')) {
+                            deleteItem(id);
+                        }
+                    });
+                });
+            }
+
+            // ====== DOWNLOAD QR ======
+            function downloadQrCode(itemId, itemName) {
+                const container = document.getElementById('grid-qr-' + itemId) || document.getElementById('detailQrContainer');
+                if (!container) return;
+                const canvas = container.querySelector('canvas');
+                if (!canvas) { showToast('⚠️ QR not ready'); return; }
+                const link = document.createElement('a');
+                link.download = `qr_${itemName.replace(/\s+/g, '_')}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                showToast(`📥 QR for "${itemName}" downloaded`);
+            }
+
+            // ====== DETAIL MODAL ======
+            function openDetail(id) {
+                const item = items.find(it => it.id === id);
+                if (!item) { showToast('Item not found'); return; }
+                editingId = id;
+
+                // Fill data
+                detailName.textContent = item.name;
+                detailCategory.textContent = item.category;
+                detailPurchase.textContent = formatDate(item.purchaseDate);
+                detailWarranty.textContent = warrantyLabel(item.warranty);
+                detailDetails.textContent = item.details || '—';
+
+                // Photo
+                const existingImg = detailContent.querySelector('.detail-img');
+                if (existingImg) existingImg.remove();
+                const placeholder = detailContent.querySelector('.detail-img-placeholder');
+                if (placeholder) placeholder.remove();
+
+                if (item.photoData) {
+                    const img = document.createElement('img');
+                    img.src = item.photoData;
+                    img.className = 'detail-img';
+                    img.alt = item.name;
+                    detailContent.prepend(img);
+                } else {
+                    const div = document.createElement('div');
+                    div.className = 'detail-img-placeholder';
+                    div.innerHTML = '<i class="fas fa-camera"></i>';
+                    detailContent.prepend(div);
+                }
+
+                // QR
+                detailQrContainer.innerHTML = '';
+                new QRCode(detailQrContainer, {
+                    text: `item:${item.id}`,
+                    width: 120,
+                    height: 120,
+                    colorDark: "#0f172a",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+
+                // Hide edit section by default
+                editSection.style.display = 'none';
+
+                detailModal.classList.add('active');
+            }
+
+            // ====== SHOW EDIT SECTION ======
+            function showEditSection(id) {
+                const item = items.find(it => it.id === id);
+                if (!item) return;
+
+                editSection.style.display = 'block';
+                editName.value = item.name;
+                editCategory.value = item.category;
+                editPurchase.value = item.purchaseDate || '';
+                editWarranty.value = item.warranty || 0;
+                editDetails.value = item.details || '';
+                editPhoto.value = '';
+                editingId = id;
+            }
+
+            // ====== CLOSE DETAIL ======
+            function closeDetail() {
+                detailModal.classList.remove('active');
+                editingId = null;
+                editSection.style.display = 'none';
+            }
+
+            // ====== CRUD ======
+            function addItem(item) {
+                items.push(item);
+                saveItems();
+                renderGrid();
+                showToast(`✅ "${item.name}" added.`);
+            }
+
+            function updateItem(id, updated) {
+                const idx = items.findIndex(it => it.id === id);
+                if (idx !== -1) {
+                    // Preserve photo if not updated
+                    if (!updated.photoData && items[idx].photoData) {
+                        updated.photoData = items[idx].photoData;
+                    }
+                    items[idx] = { ...items[idx], ...updated };
+                    saveItems();
+                    renderGrid();
+                    showToast(`✏️ "${updated.name}" updated.`);
+                    closeDetail();
+                }
+            }
+
+            function deleteItem(id) {
+                if (!isLoggedIn || currentRole !== 'admin') {
+                    showToast('⛔ Admin only.');
+                    return;
+                }
+                const item = items.find(it => it.id === id);
+                if (!item) return;
+                items = items.filter(it => it.id !== id);
+                saveItems();
+                renderGrid();
+                showToast(`🗑️ "${item.name}" deleted.`);
+                if (editingId === id) closeDetail();
+            }
+
+            // ====== PERSISTENCE ======
+            function saveItems() {
+                localStorage.setItem('inventoryItems', JSON.stringify(items));
+            }
+
+            function loadItems() {
+                const stored = localStorage.getItem('inventoryItems');
+                if (stored) {
+                    try { items = JSON.parse(stored); } catch (e) { items = []; }
+                } else {
+                    items = [
+                        { id: generateId(), name: 'Dell XPS 15', category: 'Laptop', purchaseDate: '2025-02-10',
+                            warranty: 24, details: 'i7, 16GB, 512GB SSD', photoData: null },
+                        { id: generateId(), name: 'HP 24" Monitor', category: 'Monitor', purchaseDate: '2025-01-05',
+                            warranty: 12, details: '1920x1080, IPS', photoData: null },
+                        { id: generateId(), name: 'Logitech MX Keys', category: 'Keyboard', purchaseDate: '2025-03-01',
+                            warranty: 6, details: 'Wireless, backlit', photoData: null }
+                    ];
+                    saveItems();
+                }
+                renderGrid();
+            }
+
+            // ====== LOGIN / LOGOUT ======
+            function login(username, password) {
+                const user = USERS[username];
+                if (!user || user.password !== password) {
+                    loginError.classList.add('show');
+                    return false;
+                }
+                loginError.classList.remove('show');
+                isLoggedIn = true;
+                currentRole = user.role;
+                loginOverlay.classList.remove('active');
+                updateLoginState();
+                showToast(`✅ Logged in as ${username} (${currentRole})`);
+                renderGrid();
+                return true;
+            }
+
+            function logout() {
+                isLoggedIn = false;
+                currentRole = 'staff';
+                updateLoginState();
+                showToast('🔓 Logged out');
+                closeDetail();
+                if (html5QrCode) { html5QrCode.stop().then(() => {}); html5QrCode = null; }
+                scannerOverlay.classList.remove('active');
+                document.getElementById('qr-reader').innerHTML = '';
+                renderGrid();
+            }
+
+            function updateLoginState() {
+                const badge = viewModeBadge;
+                const btn = loginToggleBtn;
+                if (isLoggedIn) {
+                    badge.innerHTML =
+                        `<i class="fas fa-user-shield"></i> ${currentRole === 'admin' ? 'Admin' : 'Staff'} (editable)`;
+                    badge.style.background = '#dcfce7';
+                    badge.style.color = '#166534';
+                    btn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+                    btn.onclick = logout;
+                    addItemBtn.style.display = 'inline-flex';
+                } else {
+                    badge.innerHTML = '<i class="fas fa-eye"></i> Public View';
+                    badge.style.background = '#eef2ff';
+                    badge.style.color = '#1e293b';
+                    btn.innerHTML = '<i class="fas fa-lock"></i> Login to Edit';
+                    btn.onclick = () => loginOverlay.classList.add('active');
+                    addItemBtn.style.display = 'none';
+                }
+            }
+
+            // ====== QR SCANNER ======
+            function startScanner() {
+                scannerOverlay.classList.add('active');
+                const readerContainer = document.getElementById('qr-reader');
+                readerContainer.innerHTML = '';
+                scannerStatus.textContent = 'Initializing camera...';
+
+                if (html5QrCode) {
+                    html5QrCode.stop().then(() => { html5QrCode = null;
+                        startScanner(); });
+                    return;
+                }
+
+                html5QrCode = new Html5Qrcode("qr-reader");
+                const config = { fps: 15, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 };
+                html5QrCode.start({ facingMode: "environment" }, config,
+                    (decodedText) => {
+                        const match = decodedText.match(/item:(.+)/);
+                        if (match && match[1]) {
+                            const id = match[1];
+                            const found = items.find(it => it.id === id);
+                            if (found) {
+                                showToast(`🔍 Scanned: ${found.name}`);
+                                scannerOverlay.classList.remove('active');
+                                html5QrCode.stop().then(() => { html5QrCode = null; });
+                                openDetail(id);
+                            } else {
+                                showToast('⚠️ Item not found');
+                                scannerStatus.textContent = '❌ Item not found';
+                            }
+                        } else {
+                            showToast('⚠️ Invalid QR');
+                            scannerStatus.textContent = '⚠️ Invalid QR';
+                        }
+                    },
+                    () => {}
+                ).catch(() => {
+                    scannerStatus.textContent = '❌ Camera error';
+                    showToast('⚠️ Camera access denied');
+                });
+            }
+
+            function stopScanner() {
+                if (html5QrCode) {
+                    html5QrCode.stop().then(() => {
+                        html5QrCode = null;
+                        document.getElementById('qr-reader').innerHTML = '';
+                        scannerOverlay.classList.remove('active');
+                    });
+                } else {
+                    scannerOverlay.classList.remove('active');
+                }
+            }
+
+            // ====== EVENT BINDINGS ======
+            // Login
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const uname = loginUsername.value.trim().toLowerCase();
+                const pwd = loginPassword.value;
+                if (!uname || !pwd) { loginError.classList.add('show'); return; }
+                login(uname, pwd);
+            });
+
+            closeLoginBtn.addEventListener('click', () => loginOverlay.classList.remove('active'));
+            loginOverlay.addEventListener('click', function(e) {
+                if (e.target === this) loginOverlay.classList.remove('active');
+            });
+
+            // Scanner
+            scanQrBtn.addEventListener('click', startScanner);
+            closeScannerBtn.addEventListener('click', stopScanner);
+            scannerOverlay.addEventListener('click', function(e) {
+                if (e.target === this) stopScanner();
+            });
+
+            // Detail modal
+            closeModalBtn.addEventListener('click', closeDetail);
+            detailModal.addEventListener('click', function(e) {
+                if (e.target === this) closeDetail();
+            });
+
+            detailDownloadQr.addEventListener('click', function() {
+                if (editingId) {
+                    const item = items.find(it => it.id === editingId);
+                    if (item) downloadQrCode(editingId, item.name);
+                }
+            });
+
+            // Add item
+            addItemBtn.addEventListener('click', function() {
+                if (!isLoggedIn) {
+                    showToast('🔒 Please login first');
+                    loginOverlay.classList.add('active');
+                    return;
+                }
+                // Open a simple prompt for quick add, or we can open a modal
+                const name = prompt('Enter item name:');
+                if (!name) return;
+                const category = prompt('Category (Laptop/Monitor/Keyboard/Mouse/Dock/Headset/Other):') || 'Other';
+                const newItem = {
+                    id: generateId(),
+                    name: name.trim(),
+                    category: category,
+                    purchaseDate: '',
+                    warranty: 0,
+                    details: '',
+                    photoData: null
+                };
+                addItem(newItem);
+            });
+
+            // Edit form submit
+            editForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (!editingId || !isLoggedIn || currentRole !== 'admin') {
+                    showToast('⛔ Admin only');
+                    return;
+                }
+                const name = editName.value.trim();
+                if (!name) { showToast('⚠️ Name is required'); return; }
+
+                const file = editPhoto.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(ev) {
+                        updateItem(editingId, {
+                            name: name,
+                            category: editCategory.value,
+                            purchaseDate: editPurchase.value,
+                            warranty: parseInt(editWarranty.value) || 0,
+                            details: editDetails.value.trim(),
+                            photoData: ev.target.result
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    updateItem(editingId, {
+                        name: name,
+                        category: editCategory.value,
+                        purchaseDate: editPurchase.value,
+                        warranty: parseInt(editWarranty.value) || 0,
+                        details: editDetails.value.trim()
+                    });
+                }
+            });
+
+            editDeleteBtn.addEventListener('click', function() {
+                if (editingId && confirm('Delete this item?')) {
+                    deleteItem(editingId);
+                }
+            });
+
+            editCancelBtn.addEventListener('click', function() {
+                editSection.style.display = 'none';
+                editingId = null;
+                showToast('Edit canceled');
+            });
+
+            // ====== INIT ======
+            isLoggedIn = false;
+            loadItems();
+            loginOverlay.classList.remove('active');
+            detailModal.classList.remove('active');
+            scannerOverlay.classList.remove('active');
+            updateLoginState();
+
+            // If user navigates away, close modals
+            window.addEventListener('popstate', function() {
+                closeDetail();
+                stopScanner();
+            });
+
+        })();
+    </script>
 </body>
 </html>
