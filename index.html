@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OfficeStock Pro · Fixed QR & Add Item</title>
+    <title>OfficeStock Pro · Fixed QR URLs</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -397,7 +397,7 @@
             margin-top: 14px;
         }
 
-        /* ----- ADD ITEM MODAL (Improved UI) ----- */
+        /* ----- ADD ITEM MODAL ----- */
         #addItemModal .modal-card {
             max-width: 600px;
         }
@@ -777,7 +777,7 @@
             </div>
         </div>
 
-        <!-- ====== ADD ITEM MODAL (Improved UI) ====== -->
+        <!-- ====== ADD ITEM MODAL ====== -->
         <div id="addItemModal" class="modal-overlay">
             <div class="modal-card">
                 <button class="close-modal" id="closeAddModalBtn">&times;</button>
@@ -917,6 +917,9 @@
             const addPhoto = document.getElementById('addPhoto');
             const addDetails = document.getElementById('addDetails');
 
+            // ====== BASE URL ======
+            const BASE_URL = window.location.origin + window.location.pathname.replace(/\/$/, '');
+
             // ====== TOAST ======
             function showToast(msg) {
                 toast.textContent = msg;
@@ -941,6 +944,25 @@
                 if (months == 24) return '2 yr';
                 if (months == 36) return '3 yr';
                 return months + ' mo';
+            }
+
+            // ====== GENERATE QR WITH URL ======
+            function generateQR(container, itemId) {
+                const url = `${BASE_URL}?item=${itemId}`;
+                container.innerHTML = '';
+                try {
+                    new QRCode(container, {
+                        text: url,
+                        width: 44,
+                        height: 44,
+                        colorDark: "#0f172a",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                } catch(e) {
+                    console.warn('QR generation failed:', e);
+                    container.innerHTML = '<div style="color:#94a3b8; font-size:0.7rem;">QR Error</div>';
+                }
             }
 
             // ====== RENDER GRID ======
@@ -990,23 +1012,11 @@
                 itemGrid.innerHTML = html;
                 itemCountPublic.textContent = items.length + ' items';
 
-                // Generate QR codes
+                // Generate QR codes with URLs
                 items.forEach(item => {
                     const container = document.getElementById('grid-qr-' + item.id);
                     if (container) {
-                        container.innerHTML = '';
-                        try {
-                            new QRCode(container, {
-                                text: `item:${item.id}`,
-                                width: 44,
-                                height: 44,
-                                colorDark: "#0f172a",
-                                colorLight: "#ffffff",
-                                correctLevel: QRCode.CorrectLevel.H
-                            });
-                        } catch(e) {
-                            console.warn('QR generation failed for item', item.id);
-                        }
+                        generateQR(container, item.id);
                     }
                 });
 
@@ -1119,11 +1129,12 @@
                     detailContent.prepend(div);
                 }
 
-                // QR
+                // QR with URL
                 detailQrContainer.innerHTML = '';
                 try {
+                    const url = `${BASE_URL}?item=${item.id}`;
                     new QRCode(detailQrContainer, {
-                        text: `item:${item.id}`,
+                        text: url,
                         width: 120,
                         height: 120,
                         colorDark: "#0f172a",
@@ -1368,30 +1379,68 @@
                         config,
                         (decodedText, decodedResult) => {
                             // Success callback
-                            const match = decodedText.match(/item:(.+)/);
-                            if (match && match[1]) {
-                                const id = match[1];
-                                const found = items.find(it => it.id === id);
-                                if (found) {
-                                    showToast(`🔍 Scanned: ${found.name}`);
-                                    scannerOverlay.classList.remove('active');
-                                    isScanning = false;
-                                    html5QrCode.stop().then(() => {
-                                        html5QrCode = null;
-                                        openDetail(id);
-                                    });
-                                } else {
-                                    showToast('⚠️ Item not found');
-                                    scannerStatus.textContent = '❌ Item not found. Try again.';
+                            try {
+                                // Check if it's a URL with item parameter
+                                let itemId = null;
+                                
+                                // Try to parse as URL
+                                if (decodedText.startsWith('http://') || decodedText.startsWith('https://')) {
+                                    try {
+                                        const url = new URL(decodedText);
+                                        const params = new URLSearchParams(url.search);
+                                        if (params.has('item')) {
+                                            itemId = params.get('item');
+                                        }
+                                    } catch(e) {
+                                        // Not a valid URL
+                                    }
                                 }
-                            } else {
-                                showToast('⚠️ Invalid QR code');
-                                scannerStatus.textContent = '⚠️ Invalid QR. Scan an inventory QR.';
+                                
+                                // If not found in URL, try direct match
+                                if (!itemId && decodedText.match(/item:(.+)/)) {
+                                    itemId = decodedText.match(/item:(.+)/)[1];
+                                }
+                                
+                                // If still not found, try using the whole text as ID
+                                if (!itemId) {
+                                    // Check if the text is just an ID (no URL)
+                                    const possibleId = decodedText.trim();
+                                    const found = items.find(it => it.id === possibleId);
+                                    if (found) {
+                                        itemId = possibleId;
+                                    }
+                                }
+                                
+                                if (itemId) {
+                                    const found = items.find(it => it.id === itemId);
+                                    if (found) {
+                                        showToast(`🔍 Scanned: ${found.name}`);
+                                        scannerOverlay.classList.remove('active');
+                                        isScanning = false;
+                                        if (html5QrCode) {
+                                            html5QrCode.stop().then(() => {
+                                                html5QrCode = null;
+                                                openDetail(itemId);
+                                            });
+                                        } else {
+                                            openDetail(itemId);
+                                        }
+                                        return;
+                                    } else {
+                                        showToast('⚠️ Item not found');
+                                        scannerStatus.textContent = '❌ Item not found. Try again.';
+                                    }
+                                } else {
+                                    showToast('⚠️ Invalid QR code');
+                                    scannerStatus.textContent = '⚠️ Invalid QR. Scan an inventory QR.';
+                                }
+                            } catch(e) {
+                                showToast('⚠️ Error processing QR');
+                                scannerStatus.textContent = '❌ Error: ' + e.message;
                             }
                         },
                         (errorMessage) => {
                             // Error callback - ignore, continuous scanning
-                            // Don't show errors for every frame
                         }
                     ).catch((err) => {
                         scannerStatus.textContent = '❌ Camera error: ' + err;
@@ -1419,6 +1468,26 @@
                     });
                 } else {
                     scannerOverlay.classList.remove('active');
+                }
+            }
+
+            // ====== URL ROUTING ======
+            function handleURLRouting() {
+                const params = new URLSearchParams(window.location.search);
+                if (params.has('item')) {
+                    const itemId = params.get('item');
+                    const item = items.find(it => it.id === itemId);
+                    if (item) {
+                        // Wait for render to complete
+                        setTimeout(() => {
+                            openDetail(itemId);
+                            // Clean URL without reload
+                            if (window.history && window.history.pushState) {
+                                const newUrl = window.location.pathname;
+                                window.history.pushState({}, '', newUrl);
+                            }
+                        }, 300);
+                    }
                 }
             }
 
@@ -1575,6 +1644,9 @@
             addItemModal.classList.remove('active');
             scannerOverlay.classList.remove('active');
             updateLoginState();
+
+            // Handle URL routing after load
+            setTimeout(handleURLRouting, 500);
 
             // Close modals on escape
             document.addEventListener('keydown', function(e) {
