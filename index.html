@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OfficeStock Pro · Forgot Password</title>
+    <title>OfficeStock Pro · Fixed QR & Add Item</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -397,6 +397,80 @@
             margin-top: 14px;
         }
 
+        /* ----- ADD ITEM MODAL (Improved UI) ----- */
+        #addItemModal .modal-card {
+            max-width: 600px;
+        }
+        #addItemModal .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        #addItemModal .form-grid .full-width {
+            grid-column: 1 / -1;
+        }
+        #addItemModal .form-group {
+            margin-bottom: 4px;
+        }
+        #addItemModal .form-group label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #475569;
+            display: block;
+            margin-bottom: 4px;
+        }
+        #addItemModal .form-group input,
+        #addItemModal .form-group select,
+        #addItemModal .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 0.9rem;
+            background: #fafcff;
+            transition: 0.2s;
+        }
+        #addItemModal .form-group input:focus,
+        #addItemModal .form-group select:focus,
+        #addItemModal .form-group textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+            background: white;
+        }
+        #addItemModal .form-group .file-upload {
+            border: 1.5px dashed #cbd5e1;
+            border-radius: 16px;
+            padding: 8px 12px;
+            background: #f8fafc;
+            width: 100%;
+            cursor: pointer;
+        }
+        #addItemModal .form-group .file-upload:hover {
+            background: #f1f5f9;
+        }
+        #addItemModal .form-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 2px solid #f1f5f9;
+        }
+        #addItemModal .form-actions .btn {
+            flex: 1;
+            justify-content: center;
+            min-width: 120px;
+        }
+        @media (max-width: 600px) {
+            #addItemModal .form-grid {
+                grid-template-columns: 1fr;
+            }
+            #addItemModal .form-actions .btn {
+                flex: 1 1 100%;
+            }
+        }
+
         /* ----- LOGIN OVERLAY ----- */
         .login-overlay {
             position: fixed;
@@ -703,15 +777,15 @@
             </div>
         </div>
 
-        <!-- ====== ADD ITEM MODAL ====== -->
+        <!-- ====== ADD ITEM MODAL (Improved UI) ====== -->
         <div id="addItemModal" class="modal-overlay">
             <div class="modal-card">
                 <button class="close-modal" id="closeAddModalBtn">&times;</button>
-                <div class="modal-title"><i class="fas fa-plus-circle"></i> Add New Item</div>
+                <div class="modal-title"><i class="fas fa-plus-circle"></i> Add New Hardware</div>
                 <form id="addItemForm">
-                    <div class="form-row">
+                    <div class="form-grid">
                         <div class="form-group">
-                            <label>Item Name *</label>
+                            <label>Item Name <span style="color:#dc2626;">*</span></label>
                             <input type="text" id="addName" placeholder="e.g. Dell XPS 15" required>
                         </div>
                         <div class="form-group">
@@ -721,8 +795,6 @@
                                 <option>Mouse</option><option>Dock</option><option>Headset</option><option>Other</option>
                             </select>
                         </div>
-                    </div>
-                    <div class="form-row">
                         <div class="form-group">
                             <label>Purchase Date</label>
                             <input type="date" id="addPurchase">
@@ -730,19 +802,19 @@
                         <div class="form-group">
                             <label>Warranty</label>
                             <select id="addWarranty">
-                                <option value="0">None</option><option value="6">6 mo</option>
-                                <option value="12" selected>12 mo</option><option value="24">24 mo</option><option value="36">36 mo</option>
+                                <option value="0">None</option><option value="6">6 months</option>
+                                <option value="12" selected>12 months</option><option value="24">24 months</option>
+                                <option value="36">36 months</option>
                             </select>
                         </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
+                        <div class="form-group full-width">
                             <label>Photo (optional)</label>
                             <input type="file" id="addPhoto" accept="image/*" class="file-upload">
+                            <div style="font-size:0.75rem; color:#94a3b8; margin-top:4px;">Upload an image of the item (JPG, PNG, WebP)</div>
                         </div>
-                        <div class="form-group">
-                            <label>Details</label>
-                            <input type="text" id="addDetails" placeholder="Serial, specs...">
+                        <div class="form-group full-width">
+                            <label>Additional Details</label>
+                            <input type="text" id="addDetails" placeholder="Serial number, specifications, location...">
                         </div>
                     </div>
                     <div class="form-actions">
@@ -783,6 +855,7 @@
             let isLoggedIn = false;
             let editingId = null;
             let html5QrCode = null;
+            let isScanning = false;
 
             // ====== DOM REFS ======
             const itemGrid = document.getElementById('itemGrid');
@@ -922,14 +995,18 @@
                     const container = document.getElementById('grid-qr-' + item.id);
                     if (container) {
                         container.innerHTML = '';
-                        new QRCode(container, {
-                            text: `item:${item.id}`,
-                            width: 44,
-                            height: 44,
-                            colorDark: "#0f172a",
-                            colorLight: "#ffffff",
-                            correctLevel: QRCode.CorrectLevel.H
-                        });
+                        try {
+                            new QRCode(container, {
+                                text: `item:${item.id}`,
+                                width: 44,
+                                height: 44,
+                                colorDark: "#0f172a",
+                                colorLight: "#ffffff",
+                                correctLevel: QRCode.CorrectLevel.H
+                            });
+                        } catch(e) {
+                            console.warn('QR generation failed for item', item.id);
+                        }
                     }
                 });
 
@@ -990,14 +1067,24 @@
             // ====== DOWNLOAD QR ======
             function downloadQrCode(itemId, itemName) {
                 const container = document.getElementById('grid-qr-' + itemId) || document.getElementById('detailQrContainer');
-                if (!container) return;
+                if (!container) {
+                    showToast('⚠️ QR code not found');
+                    return;
+                }
                 const canvas = container.querySelector('canvas');
-                if (!canvas) { showToast('⚠️ QR not ready'); return; }
-                const link = document.createElement('a');
-                link.download = `qr_${itemName.replace(/\s+/g, '_')}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                showToast(`📥 QR for "${itemName}" downloaded`);
+                if (!canvas) {
+                    showToast('⚠️ QR not ready yet');
+                    return;
+                }
+                try {
+                    const link = document.createElement('a');
+                    link.download = `qr_${itemName.replace(/\s+/g, '_')}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    showToast(`📥 QR for "${itemName}" downloaded`);
+                } catch(e) {
+                    showToast('⚠️ Failed to download QR');
+                }
             }
 
             // ====== DETAIL MODAL ======
@@ -1034,14 +1121,18 @@
 
                 // QR
                 detailQrContainer.innerHTML = '';
-                new QRCode(detailQrContainer, {
-                    text: `item:${item.id}`,
-                    width: 120,
-                    height: 120,
-                    colorDark: "#0f172a",
-                    colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.H
-                });
+                try {
+                    new QRCode(detailQrContainer, {
+                        text: `item:${item.id}`,
+                        width: 120,
+                        height: 120,
+                        colorDark: "#0f172a",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                } catch(e) {
+                    detailQrContainer.innerHTML = '<div style="color:#dc2626;">QR Error</div>';
+                }
 
                 // Hide edit section by default
                 editSection.style.display = 'none';
@@ -1080,7 +1171,7 @@
                 }
                 addItemModal.classList.add('active');
                 addItemForm.reset();
-                addName.focus();
+                setTimeout(() => addName.focus(), 100);
             }
 
             function closeAddItemModal() {
@@ -1159,7 +1250,6 @@
                 isLoggedIn = true;
                 currentRole = user.role;
                 loginOverlay.classList.remove('active');
-                // Reset forgot section
                 forgotSection.classList.remove('active');
                 updateLoginState();
                 showToast(`✅ Logged in as ${username} (${currentRole})`);
@@ -1174,9 +1264,7 @@
                 showToast('🔓 Logged out');
                 closeDetail();
                 closeAddItemModal();
-                if (html5QrCode) { html5QrCode.stop().then(() => {}); html5QrCode = null; }
-                scannerOverlay.classList.remove('active');
-                document.getElementById('qr-reader').innerHTML = '';
+                stopScanner();
                 renderGrid();
             }
 
@@ -1239,7 +1327,6 @@
                 }
                 if (USERS[username]) {
                     showToast(`📧 Password reset link sent to ${username}@example.com`);
-                    // Simulate sending email
                     setTimeout(() => {
                         hideForgotPassword();
                         showToast(`💡 Hint: Your password is "${USERS[username].password}"`);
@@ -1252,49 +1339,80 @@
 
             // ====== QR SCANNER ======
             function startScanner() {
+                if (isScanning) return;
+                isScanning = true;
+                
                 scannerOverlay.classList.add('active');
                 const readerContainer = document.getElementById('qr-reader');
                 readerContainer.innerHTML = '';
                 scannerStatus.textContent = 'Initializing camera...';
 
                 if (html5QrCode) {
-                    html5QrCode.stop().then(() => { html5QrCode = null;
-                        startScanner(); });
+                    html5QrCode.stop().then(() => {
+                        html5QrCode = null;
+                        startScanner();
+                    });
                     return;
                 }
 
-                html5QrCode = new Html5Qrcode("qr-reader");
-                const config = { fps: 15, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 };
-                html5QrCode.start({ facingMode: "environment" }, config,
-                    (decodedText) => {
-                        const match = decodedText.match(/item:(.+)/);
-                        if (match && match[1]) {
-                            const id = match[1];
-                            const found = items.find(it => it.id === id);
-                            if (found) {
-                                showToast(`🔍 Scanned: ${found.name}`);
-                                scannerOverlay.classList.remove('active');
-                                html5QrCode.stop().then(() => { html5QrCode = null; });
-                                openDetail(id);
+                try {
+                    html5QrCode = new Html5Qrcode("qr-reader");
+                    const config = { 
+                        fps: 15, 
+                        qrbox: { width: 250, height: 250 }, 
+                        aspectRatio: 1.0 
+                    };
+                    
+                    html5QrCode.start(
+                        { facingMode: "environment" },
+                        config,
+                        (decodedText, decodedResult) => {
+                            // Success callback
+                            const match = decodedText.match(/item:(.+)/);
+                            if (match && match[1]) {
+                                const id = match[1];
+                                const found = items.find(it => it.id === id);
+                                if (found) {
+                                    showToast(`🔍 Scanned: ${found.name}`);
+                                    scannerOverlay.classList.remove('active');
+                                    isScanning = false;
+                                    html5QrCode.stop().then(() => {
+                                        html5QrCode = null;
+                                        openDetail(id);
+                                    });
+                                } else {
+                                    showToast('⚠️ Item not found');
+                                    scannerStatus.textContent = '❌ Item not found. Try again.';
+                                }
                             } else {
-                                showToast('⚠️ Item not found');
-                                scannerStatus.textContent = '❌ Item not found';
+                                showToast('⚠️ Invalid QR code');
+                                scannerStatus.textContent = '⚠️ Invalid QR. Scan an inventory QR.';
                             }
-                        } else {
-                            showToast('⚠️ Invalid QR');
-                            scannerStatus.textContent = '⚠️ Invalid QR';
+                        },
+                        (errorMessage) => {
+                            // Error callback - ignore, continuous scanning
+                            // Don't show errors for every frame
                         }
-                    },
-                    () => {}
-                ).catch(() => {
-                    scannerStatus.textContent = '❌ Camera error';
-                    showToast('⚠️ Camera access denied');
-                });
+                    ).catch((err) => {
+                        scannerStatus.textContent = '❌ Camera error: ' + err;
+                        showToast('⚠️ Camera access denied');
+                        isScanning = false;
+                    });
+                } catch (e) {
+                    scannerStatus.textContent = '❌ Error: ' + e.message;
+                    showToast('⚠️ Scanner initialization failed');
+                    isScanning = false;
+                }
             }
 
             function stopScanner() {
+                isScanning = false;
                 if (html5QrCode) {
                     html5QrCode.stop().then(() => {
+                        html5QrCode = null;
+                        document.getElementById('qr-reader').innerHTML = '';
+                        scannerOverlay.classList.remove('active');
+                    }).catch(() => {
                         html5QrCode = null;
                         document.getElementById('qr-reader').innerHTML = '';
                         scannerOverlay.classList.remove('active');
@@ -1345,6 +1463,10 @@
 
                 const file = addPhoto.files[0];
                 if (file) {
+                    if (file.size > 5 * 1024 * 1024) {
+                        showToast('⚠️ Image too large (max 5MB)');
+                        return;
+                    }
                     const reader = new FileReader();
                     reader.onload = function(ev) {
                         addItem({
@@ -1356,6 +1478,9 @@
                             details: addDetails.value.trim(),
                             photoData: ev.target.result
                         });
+                    };
+                    reader.onerror = function() {
+                        showToast('⚠️ Failed to read image');
                     };
                     reader.readAsDataURL(file);
                 } else {
@@ -1403,6 +1528,10 @@
 
                 const file = editPhoto.files[0];
                 if (file) {
+                    if (file.size > 5 * 1024 * 1024) {
+                        showToast('⚠️ Image too large (max 5MB)');
+                        return;
+                    }
                     const reader = new FileReader();
                     reader.onload = function(ev) {
                         updateItem(editingId, {
